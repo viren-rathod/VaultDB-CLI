@@ -43,3 +43,6 @@ Thumbs.db
 
 # Environment files
 .env
+
+# Backup data
+/backups

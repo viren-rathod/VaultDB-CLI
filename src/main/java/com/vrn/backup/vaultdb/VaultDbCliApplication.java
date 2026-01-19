@@ -1,4 +1,4 @@
-package com.vrn.backup.vaultdb_cli;
+package com.vrn.backup.vaultdb;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
