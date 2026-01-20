@@ -23,9 +23,20 @@ public class BackupCommands {
                                @ShellOption(help = "Database Host") String host,
                                @ShellOption(defaultValue = "3306", help = "Database Port") int port,
                                @ShellOption(help = "Username") String user,
-                               @ShellOption(help = "Password (or via env var)") String password,
+                               @ShellOption(defaultValue = ShellOption.NULL, help = "Password (or via env var)") String password,
                                @ShellOption(help = "Database Name") String dbName,
                                @ShellOption(defaultValue = "local", help = "Storage (local, s3)") String storage) {
+
+        // Fallback to Environment Variable if password is null/empty
+        if (password == null || password.trim().isEmpty()) {
+            password = System.getenv("DB_PWD");
+        }
+
+        // Validate that we have a password
+        if (password == null || password.trim().isEmpty()) {
+            return "Error: Password must be provided via --password argument or DB_PWD environment variable.";
+        }
+
         BackupRequest request = BackupRequest.builder()
                 .type(type)
                 .host(host)
@@ -65,17 +76,36 @@ public class BackupCommands {
                                 @ShellOption(help = "Database Host") String host,
                                 @ShellOption(defaultValue = "3306", help = "Database Port") int port,
                                 @ShellOption(help = "Username") String user,
-                                @ShellOption(help = "Password") String password,
+                                @ShellOption(defaultValue = ShellOption.NULL, help = "Password (or via env var)") String password,
                                 @ShellOption(help = "Target Database Name") String dbName,
                                 @ShellOption(help = "Path to backup file (remote key or local relative path)") String filePath) {
+        // Fallback to Environment Variable if password is null/empty
+        if (password == null || password.trim().isEmpty()) {
+            password = System.getenv("DB_PWD");
+        }
+
+        // Validate that we have a password
+        if (password == null || password.trim().isEmpty()) {
+            return "Error: Password must be provided via --password argument or DB_PWD environment variable.";
+        }
+
         BackupRequest request = BackupRequest.builder()
-                .type(type).host(host).port(port).username(user).password(password).dbName(dbName)
+                .type(type)
+                .host(host)
+                .port(port)
+                .username(user)
+                .password(password)
+                .dbName(dbName)
                 .build();
         try {
             backupService.performRestore(request, filePath);
             return "Restore process completed.";
-        } catch (Exception e) {
+        } catch (BackupException e) {
+            log.error("Restore error", e);
             return "Restore failed: " + e.getMessage();
+        } catch (Exception e) {
+            log.error("Unexpected error", e);
+            return "Critical error: " + e.getMessage();
         }
     }
 
