@@ -130,4 +130,4 @@ Generate the command needed to run backups automatically via Cron (Linux) or Tas
 backup schedule --cron "0 2 * * *" --command "backup create --type mysql --dbName mydb ..."
 ```
 
-Project: https://github.com/viren-rathod/VaultDB-CLI
+Project: https://roadmap.sh/projects/database-backup-utility
